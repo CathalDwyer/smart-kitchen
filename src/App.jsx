@@ -2,6 +2,7 @@ import { useState } from "react";
 import InputPanel from "./components/inputs/InputPanel";
 import { useGemini } from "./hooks/useGemini";
 import { TIME_OPTIONS } from "./constants/schema";
+import DashboardSkeleton from "./components/ui/DashboardSkeleton";
 
 const initialFormState = {
   ingredients: [],
@@ -45,6 +46,8 @@ function App() {
           <p className="text-red-400 text-sm">{error}</p>
         )}
 
+        {status === "loading" && <DashboardSkeleton />}
+        
         {status === "success" && (
           <pre className="text-xs text-stone-300 bg-stone-900 p-3 rounded-lg overflow-auto">
             {JSON.stringify(data, null, 2)}

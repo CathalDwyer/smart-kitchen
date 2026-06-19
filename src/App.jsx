@@ -6,6 +6,7 @@ import DashboardSkeleton from "./components/ui/DashboardSkeleton";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import Toast from "./components/ui/Toast";
 import RecipeHeader from "./components/dashboard/RecipeHeader";
+import MissingIngredients from "./components/dashboard/MissingIngredients";
 
 const initialFormState = {
   ingredients: [],
@@ -52,6 +53,10 @@ function App() {
         {status === "success" && (
           <div className="space-y-4">
             <RecipeHeader recipe={data} />
+             <MissingIngredients
+              utilizedIngredients={data.utilizedIngredients}
+              missingIngredientsToBuy={data.missingIngredientsToBuy}
+            />
             <pre className="text-xs text-stone-500 bg-stone-900 p-3 rounded-lg overflow-auto">
               {JSON.stringify(data, null, 2)}
             </pre>

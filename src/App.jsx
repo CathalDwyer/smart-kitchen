@@ -5,6 +5,7 @@ import { TIME_OPTIONS } from "./constants/schema";
 import DashboardSkeleton from "./components/ui/DashboardSkeleton";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import Toast from "./components/ui/Toast";
+import RecipeHeader from "./components/dashboard/RecipeHeader";
 
 const initialFormState = {
   ingredients: [],
@@ -49,9 +50,12 @@ function App() {
         )}
 
         {status === "success" && (
-          <pre className="text-xs text-stone-300 bg-stone-900 p-3 rounded-lg overflow-auto">
-            {JSON.stringify(data, null, 2)}
-          </pre>
+          <div className="space-y-4">
+            <RecipeHeader recipe={data} />
+            <pre className="text-xs text-stone-500 bg-stone-900 p-3 rounded-lg overflow-auto">
+              {JSON.stringify(data, null, 2)}
+            </pre>
+          </div>
         )}
       </div>
 

@@ -3,6 +3,8 @@ import InputPanel from "./components/inputs/InputPanel";
 import { useGemini } from "./hooks/useGemini";
 import { TIME_OPTIONS } from "./constants/schema";
 import DashboardSkeleton from "./components/ui/DashboardSkeleton";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
+import Toast from "./components/ui/Toast";
 
 const initialFormState = {
   ingredients: [],
@@ -13,7 +15,7 @@ const initialFormState = {
 
 function App() {
   const [formState, setFormState] = useState(initialFormState);
-  const { status, data, error, generate } = useGemini();
+  const { status, data, error, generate, reset } = useGemini();
 
   const handleGenerate = () => {
     const allIngredients = [...formState.ingredients, ...formState.pantrySelected];
@@ -36,24 +38,30 @@ function App() {
           {status === "loading" ? "Generating..." : "Generate Recipe"}
         </button>
 
-        {status === "invalid" && (
-          <p className="text-red-400 text-sm">
-            Those don't look like food ingredients — try again with real food items!
-          </p>
-        )}
+        {status === "loading" && <DashboardSkeleton />}
 
         {status === "error" && (
-          <p className="text-red-400 text-sm">{error}</p>
+          <ErrorBoundary onRetry={reset}>
+            {(() => {
+              throw new Error(error);
+            })()}
+          </ErrorBoundary>
         )}
 
-        {status === "loading" && <DashboardSkeleton />}
-        
         {status === "success" && (
           <pre className="text-xs text-stone-300 bg-stone-900 p-3 rounded-lg overflow-auto">
             {JSON.stringify(data, null, 2)}
           </pre>
         )}
       </div>
+
+      {status === "invalid" && (
+        <Toast
+          message="Those don't look like ingredients we can cook with! Try real food items."
+          type="warning"
+          onDismiss={reset}
+        />
+      )}
     </div>
   );
 }

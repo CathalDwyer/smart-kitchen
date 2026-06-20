@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import InputPanel from "./components/inputs/InputPanel";
 import { useGemini } from "./hooks/useGemini";
 import { TIME_OPTIONS } from "./constants/schema";
@@ -6,6 +6,7 @@ import DashboardSkeleton from "./components/ui/DashboardSkeleton";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import Toast from "./components/ui/Toast";
 import RecipeDashboard from "./components/dashboard/RecipeDashboard";
+import { useRecipeCache } from "./hooks/useRecipeCache";
 
 const initialFormState = {
   ingredients: [],
@@ -17,12 +18,22 @@ const initialFormState = {
 function App() {
   const [formState, setFormState] = useState(initialFormState);
   const { status, data, error, generate, reset } = useGemini();
+  const { history, save, load, clear } = useRecipeCache();
+  const lastSavedRef = useRef(null);
 
   const handleGenerate = () => {
     const allIngredients = [...formState.ingredients, ...formState.pantrySelected];
     const timeOpt = TIME_OPTIONS.find((t) => t.id === formState.timeLimit);
     generate(allIngredients, formState.dietary, timeOpt?.maxMinutes ?? 999);
   };
+
+  // Auto-save every successful generation to the recipe cache
+  useEffect(() => {
+    if (status === "success" && data && lastSavedRef.current !== data) {
+      lastSavedRef.current = data;
+      save(formState, data);
+    }
+  }, [status, data]);
 
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 p-8">

@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ui/ErrorBoundary";
 import Toast from "./components/ui/Toast";
 import RecipeHeader from "./components/dashboard/RecipeHeader";
 import MissingIngredients from "./components/dashboard/MissingIngredients";
+import CookingSteps from "./components/dashboard/CookingSteps";
 
 const initialFormState = {
   ingredients: [],
@@ -57,6 +58,7 @@ function App() {
               utilizedIngredients={data.utilizedIngredients}
               missingIngredientsToBuy={data.missingIngredientsToBuy}
             />
+            <CookingSteps cookingSteps={data.cookingSteps} />
             <pre className="text-xs text-stone-500 bg-stone-900 p-3 rounded-lg overflow-auto">
               {JSON.stringify(data, null, 2)}
             </pre>

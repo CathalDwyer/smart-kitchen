@@ -5,9 +5,7 @@ import { TIME_OPTIONS } from "./constants/schema";
 import DashboardSkeleton from "./components/ui/DashboardSkeleton";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import Toast from "./components/ui/Toast";
-import RecipeHeader from "./components/dashboard/RecipeHeader";
-import MissingIngredients from "./components/dashboard/MissingIngredients";
-import CookingSteps from "./components/dashboard/CookingSteps";
+import RecipeDashboard from "./components/dashboard/RecipeDashboard";
 
 const initialFormState = {
   ingredients: [],
@@ -44,25 +42,22 @@ function App() {
         {status === "loading" && <DashboardSkeleton />}
 
         {status === "error" && (
-          <ErrorBoundary onRetry={reset}>
-            {(() => {
-              throw new Error(error);
-            })()}
-          </ErrorBoundary>
+          <div className="bg-red-950/40 border border-red-800 rounded-lg p-6 text-center space-y-3">
+            <p className="text-red-300 font-medium">Couldn't generate a recipe.</p>
+            <p className="text-red-400 text-sm">{error}</p>
+            <button
+              onClick={reset}
+              className="bg-red-700 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-md"
+            >
+              Try Again
+            </button>
+          </div>
         )}
 
         {status === "success" && (
-          <div className="space-y-4">
-            <RecipeHeader recipe={data} />
-             <MissingIngredients
-              utilizedIngredients={data.utilizedIngredients}
-              missingIngredientsToBuy={data.missingIngredientsToBuy}
-            />
-            <CookingSteps cookingSteps={data.cookingSteps} />
-            <pre className="text-xs text-stone-500 bg-stone-900 p-3 rounded-lg overflow-auto">
-              {JSON.stringify(data, null, 2)}
-            </pre>
-          </div>
+          <ErrorBoundary onRetry={reset}>
+            <RecipeDashboard recipe={data} />
+          </ErrorBoundary>
         )}
       </div>
 

@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ui/ErrorBoundary";
 import Toast from "./components/ui/Toast";
 import RecipeDashboard from "./components/dashboard/RecipeDashboard";
 import { useRecipeCache } from "./hooks/useRecipeCache";
+import HistorySidebar from "./components/sidebar/HistorySidebar";
 
 const initialFormState = {
   ingredients: [],
@@ -21,17 +22,30 @@ function App() {
   const { history, save, load, clear } = useRecipeCache();
   const lastSavedRef = useRef(null);
 
+  const [viewedRecipe, setViewedRecipe] = useState(null);
+  const [activeHistoryId, setActiveHistoryId] = useState(null);
+
   const handleGenerate = () => {
     const allIngredients = [...formState.ingredients, ...formState.pantrySelected];
     const timeOpt = TIME_OPTIONS.find((t) => t.id === formState.timeLimit);
     generate(allIngredients, formState.dietary, timeOpt?.maxMinutes ?? 999);
   };
 
+  const handleSelectHistory = (id) => {
+    const entry = load(id);
+    if (entry) {
+      setViewedRecipe(entry.recipeData);
+      setActiveHistoryId(id);
+    }
+  };
+
   // Auto-save every successful generation to the recipe cache
   useEffect(() => {
     if (status === "success" && data && lastSavedRef.current !== data) {
       lastSavedRef.current = data;
-      save(formState, data);
+      const entry = save(formState, data);
+      setActiveHistoryId(entry.id);
+      setViewedRecipe(null); // fresh generation takes priority over cache view
     }
   }, [status, data]);
 
@@ -65,11 +79,24 @@ function App() {
           </div>
         )}
 
-        {status === "success" && (
+        {status === "success" && !viewedRecipe && (
           <ErrorBoundary onRetry={reset}>
             <RecipeDashboard recipe={data} />
           </ErrorBoundary>
         )}
+
+        {viewedRecipe && (
+          <ErrorBoundary onRetry={() => setViewedRecipe(null)}>
+            <RecipeDashboard recipe={viewedRecipe} />
+          </ErrorBoundary>
+        )}
+
+        <HistorySidebar
+          history={history}
+          onSelect={handleSelectHistory}
+          onClear={clear}
+          activeId={activeHistoryId}
+        />
       </div>
 
       {status === "invalid" && (

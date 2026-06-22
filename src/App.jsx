@@ -80,13 +80,13 @@ function App() {
         )}
 
         {status === "success" && !viewedRecipe && (
-          <ErrorBoundary onRetry={reset}>
+          <ErrorBoundary key={data?.recipeTitle} onRetry={reset}>
             <RecipeDashboard recipe={data} />
           </ErrorBoundary>
         )}
 
         {viewedRecipe && (
-          <ErrorBoundary onRetry={() => setViewedRecipe(null)}>
+          <ErrorBoundary key={activeHistoryId} onRetry={() => setViewedRecipe(null)}>
             <RecipeDashboard recipe={viewedRecipe} />
           </ErrorBoundary>
         )}

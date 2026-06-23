@@ -21,7 +21,7 @@ export default function RecipeDashboard({ recipe }) {
           onClick={() => copy(allIngredients)}
           className="flex-1 bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 text-sm py-2 rounded-lg"
         >
-          {copied ? "✓ Copied!" : "📋 Copy Ingredients"}
+          {copied ? "✓ Copied!" : " Copy Ingredients"}
         </button>
         <button
           onClick={() => downloadMarkdown(recipe)}
@@ -34,6 +34,7 @@ export default function RecipeDashboard({ recipe }) {
       <MissingIngredients
         utilizedIngredients={recipe.utilizedIngredients}
         missingIngredientsToBuy={recipe.missingIngredientsToBuy}
+        recipe={recipe}
       />
       <CookingSteps cookingSteps={recipe.cookingSteps} />
     </div>

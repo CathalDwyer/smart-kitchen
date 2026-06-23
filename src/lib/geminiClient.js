@@ -115,4 +115,40 @@ export async function generateRecipe(ingredients, dietaryId, timeLimitMinutes) {
   }
 
   return { data: validation.data, raw: rawText, poisonPill: false };
+} 
+
+export async function suggestSwap(ingredient, recipeTitle, dietaryId) {
+  if (!genAI) {
+    throw new Error("Gemini API key is missing.");
+  }
+
+  const dietary = DIETARY_OPTIONS.find((d) => d.id === dietaryId);
+  const dietaryNote = dietary?.geminiDirective || "No dietary restrictions apply.";
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+    generationConfig: {
+      responseMimeType: "application/json",
+      temperature: 0.8,
+      maxOutputTokens: 256,
+    },
+  });
+
+  const prompt = `
+You are a chef suggesting ingredient substitutions.
+Recipe: "${recipeTitle}"
+Dietary restriction: ${dietaryNote}
+Missing ingredient: "${ingredient}"
+
+Suggest ONE substitute ingredient that works in this recipe and respects the dietary restriction.
+Return ONLY this JSON: { "substitute": "ingredient name", "reason": "one sentence explanation" }
+`.trim();
+
+  const result = await model.generateContent(prompt);
+  const rawText = result.response.text();
+  const { parsed, error } = safeParseJSON(rawText);
+  if (error || !parsed?.substitute) {
+    throw new Error("Could not parse swap suggestion.");
+  }
+  return parsed;
 }

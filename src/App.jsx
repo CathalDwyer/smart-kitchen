@@ -39,18 +39,17 @@ function App() {
     }
   };
 
-  // Auto-save every successful generation to the recipe cache
   useEffect(() => {
     if (status === "success" && data && lastSavedRef.current !== data) {
       lastSavedRef.current = data;
       const entry = save(formState, data);
       setActiveHistoryId(entry.id);
-      setViewedRecipe(null); // fresh generation takes priority over cache view
+      setViewedRecipe(null);
     }
   }, [status, data]);
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 p-8">
+    <div className="min-h-screen bg-stone-950 text-stone-100 px-4 py-6 sm:p-8">
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="text-2xl font-bold text-amber-400">Smart Kitchen</h1>
 
